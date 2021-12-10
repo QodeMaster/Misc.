@@ -59,7 +59,7 @@ void displayTime();
 void addSecondToConfiguredCalender();
 
 void CreatePulseInPin2(int pulseWidth);
-void Init(void);
+void tempInit(void);
 void StartMeasureTemp(void);
 void TC0_Handler(void);
 
@@ -383,7 +383,10 @@ void displayTime() {
   int boolean = 0;    // boolean = 0, means input values makes up valid time
   if((12 < time.date[1]) || (time.date[2] < 2021) || (23 < time.date[3]) || (59 < time.date[4]) || (59 < time.date[5])) { boolean = 1; }
   if(boolean == 0 && (months[time.date[1] - 1] < time.date[0])) { boolean = 1;}
-  if(boolean == 1) { display("INVALID INPUT!-RESTART PROGRAM"); }
+  if(boolean == 1) { 
+    display("INVALID INPUT!-RESTART PROGRAM");
+    time.decimalPointer = 15; // To inactivate the if-statement in the sysTick-handler
+  }
  }
 }
 
