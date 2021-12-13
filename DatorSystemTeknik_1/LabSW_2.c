@@ -13,18 +13,30 @@ void insertFirst(struct LinkedList **first, struct LinkedList *el) {
   (*first)->next = temp;
 }
 
-void printLL(struct LinkedList **first) {
-  struct LinkedList *holder = *first;
+void printList(struct LinkedList *first) {
+  struct LinkedList *holder = first;
   while(holder != NULL){
     printf("Id: %i \t sensorData: %lf\n", holder->id, holder->sensorData);
     holder = (holder->next);
   }
 }
 
+int LLL(struct LinkedList **first) { // Linked-List length
+  struct LinkedList *holder = *first;
+  int count = 0;
+  while(holder != NULL){
+    count++;
+    holder = (holder->next);
+  }
+
+  return count;
+}
+
 int isMember(struct LinkedList **first, struct LinkedList *el) {
   struct LinkedList *holder = *first;
   while(holder != NULL){
-    if((*el).sensorData == (*holder).sensorData) {return 1;}
+    if((*el).id == (*holder).id 
+    && (*el).sensorData == (*holder).sensorData) {return 1;}
     holder = (holder->next);
   }
   return 0;
@@ -57,15 +69,13 @@ struct LinkedList *readSensor(int id) {
   return pointer;
 }
 
-void sorter(struct LinkedList **first) {
-  for(int i = 0; i < 10; i++) {
+void sorter(struct LinkedList **first, int len) {
+  for(int i = 0; i < len; i++) {
     struct LinkedList *holder = *first;
     for(int j = 0; j < i; j++) { holder = holder->next; }
     struct LinkedList *max = holder;
     while(holder != NULL) {
-      if((max->sensorData) < (holder->sensorData)){
-        max = holder;
-      }
+      if((max->sensorData) < (holder->sensorData)){max = holder;}
       holder = (holder->next);
     }
     removeElAziziVersion(first, max);
@@ -74,51 +84,31 @@ void sorter(struct LinkedList **first) {
   }
 }
 
+void freeLL(struct LinkedList **first) {
+  struct LinkedList *holder = *first;
+  struct LinkedList *holderHolder;
+  while(holder != NULL){
+    holderHolder = holder;
+    free(holder);
+    holder = (holderHolder->next);
+  }
+}
+
 int main(void) {
-  /*struct LinkedList *list;
-  //(*list).id = 1;
-  //(list)->sensorData = 10;
-  //(*list).next = NULL;
-  struct LinkedList initial = *readSensor(1);
-  //initial.id = 1;
-  //initial.sensorData = 10;
-  initial.next = NULL;
+  /* Hello Yousra, this is the code for Gr 24. */
+  /*
+  struct LinkedList *list;
+  struct LinkedList initial;
 
-  (*list).id = initial.id;
-  (list)->sensorData = initial.sensorData;
-  (*list).next = initial.next;
+  initial.id         = 1;
+  initial.sensorData = 10;
+  initial.next       = NULL;
 
-  struct LinkedList elm = *readSensor(1);
-  //elm.id = 1;
-  //elm.sensorData = 100;
-  struct LinkedList elme = *readSensor(0);
-  //elme.id = 0;
-  //elme.sensorData = 0;
-  struct LinkedList elme2 = *readSensor(15);
-  //elme2.id = 15;
-  //elme2.sensorData = 314;
+  list->id         = initial.id;
+  list->sensorData = initial.sensorData;
+  list->next       = initial.next;*/
 
-  insertFirst(&list, &elm);
-  insertFirst(&list, &elme);
-  insertFirst(&list, &elme2);
-  printLL(&list);
-  struct LinkedList elme3;
-  elme3.id = 415;
-  elme3.sensorData = 514;
+  //freeLL(&list);
   
-  printf("isMember: %i \n", isMember(&list, &elme));
-  printf("isMember: %i \n", isMember(&list, &elme3));
-
-  removeElAziziVersion(&list, &initial);
-  printLL(&list);
-  //printf("First up: %lf \n", list->sensorData);*/
-
-  struct LinkedList *list = readSensor(1);
-  for(int i = 2; i <= 10; i++) {insertFirst(&list, readSensor(i));}
-  printLL(&list);
-  sorter(&list);
-  printf("\n");
-  printLL(&list);
-
   return 0;
 }
