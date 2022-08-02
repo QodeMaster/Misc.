@@ -137,8 +137,7 @@ mailbox* create_mailbox (uint nMessages, uint nDataSize) {
 
 exception remove_mailbox (mailbox* mBox) {
   // Removes messages if mailbox is empty
-  if(!(no_messages(mBox)))
-  {
+  if(!(no_messages(mBox))) {
     free(mBox -> pHead);
     free(mBox -> pTail);
     free(mBox);
@@ -157,15 +156,11 @@ exception send_wait( mailbox* mBox, void* pData) {
     removeTask(&WaitingList, receivingTask->pBlock); // Remove receiving task's message struct from mailbox
     moveObj(&ReadyList, receivingTask->pBlock);      // Insert new task in ReadyList
     NextTask = ReadyList->pHead->pTask;              // Update NextTask
-  }
-  
-  else
-  {
+  } else {
     message = (msg*)malloc(sizeof(msg)); // Allocate a Message structure Set data pointer
     //Set data pointer
     message->pData = (char*)malloc(mBox->nDataSize);
-    if(message->pData == NULL)
-    {
+    if(message->pData == NULL) {
       free(message);
       return FAIL;
     }
@@ -184,47 +179,31 @@ exception send_wait( mailbox* mBox, void* pData) {
     NextTask = ReadyList ->pHead ->pTask; // Update NextTask
   }
   SwitchContext(); // Switch context
-  if(Ticks >= NextTask->Deadline)
-  {
+  if(Ticks >= NextTask->Deadline) {
     isr_off(); // Disable interrupt
     deleteMsg(mBox, ReadyList->pHead->pMessage);
     isr_on(); // Enable interrupt
     return DEADLINE_REACHED; // Return DEADLINE_REACHED
-  }
-  
-  else
-    return OK;
+  } else { return OK; }
 }
 
-exception receive_wait ( mailbox* mBox, void* pData)
-{
+exception receive_wait ( mailbox* mBox, void* pData) {
   isr_off(); //Disable interrupt
   msg* sendingMsg = mBox -> pHead;
-  if(sendingMsg -> Status == SENDER)
-  {
+  if(sendingMsg -> Status == SENDER) {
     memcpy(pData, sendingMsg -> pData, mBox -> nDataSize); //Copy sender's data to data area of receivers message msg in (mBox)
     deleteMsg(mBox, sendingMsg);
     
-    if(isMember(&WaitingList, sendingMsg->pBlock))
-    {
+    if(isMember(&WaitingList, sendingMsg->pBlock)) {
       PreviousTask = ReadyList->pHead->pTask; // Update PreviousTask
       removeTask(&WaitingList, sendingMsg->pBlock);
       moveObj(&ReadyList, sendingMsg->pBlock); // Insert new task in ReadyList
       NextTask = ReadyList->pHead->pTask; // Update NextTask
       (mBox->nBlockedMsg)--;
-    }
-    else
-    {
-      free(sendingMsg->pData);
-    }
-  }
-  else
-  {
+    } else { free(sendingMsg->pData); }
+  } else {
     msg* message = (msg*)malloc(sizeof(msg)); //Allocate memmory to massage struct
-    if(message == NULL)
-    {
-      return FAIL;
-    }
+    if(message == NULL) { return FAIL; }
     
     message->pData = (char*)malloc(mBox->nDataSize);
     memcpy(message ->pData,pData, mBox ->nDataSize);
@@ -240,22 +219,17 @@ exception receive_wait ( mailbox* mBox, void* pData)
     NextTask = ReadyList ->pHead ->pTask; // Update NextTask
   }
   SwitchContext();
-  if(Ticks >= NextTask->Deadline)
-  {
+  if(Ticks >= NextTask->Deadline) {
     isr_off(); // Disable interrupt
     deleteMsg(mBox, ReadyList->pHead->pMessage);
     isr_on(); // Enable interrupt
     return DEADLINE_REACHED; // Return DEADLINE_REACHED
-  }
-  else
-    return OK;
+  } else { return OK; }
 }
-exception send_no_wait( mailbox *mBox, void *pData)
-{
+exception send_no_wait( mailbox *mBox, void *pData) {
   isr_off(); //Disable interrupt
   msg* receivingTask = mBox->pHead;
-  if(receivingTask->Status == RECEIVER) //Checking if a receiving task is waiting   //Needs to get called for testing
-  {
+  if(receivingTask->Status == RECEIVER) { //Checking if a receiving task is waiting   //Needs to get called for testing 
     memcpy(pData, receivingTask -> pData, mBox -> nDataSize); //Copy sender's data (pData) to data area of receivers message box(mBox)
     //Remove receiving task's message struct from mailbox
     deleteMsg(mBox, receivingTask); //Removes message from mBox that corrisponds with receivingTask
@@ -263,17 +237,14 @@ exception send_no_wait( mailbox *mBox, void *pData)
     removeTask(&WaitingList, receivingTask->pBlock);
     moveObj(&ReadyList, receivingTask->pBlock); // Insert new task in ReadyList
     NextTask = ReadyList->pHead->pTask; // Update NextTask
-  }
-  else
-  {
+  } else {
     msg* message = (msg*)malloc(sizeof(msg)); //Allocate memmory to massage struct
     if(message == NULL)
       return FAIL;
     message->pNext = NULL;
     message->pPrevious = NULL;
     message->pData = (char*)malloc(mBox->nDataSize);
-    if(message->pData == NULL)
-    {
+    if(message->pData == NULL) {
       free(message);
       return FAIL;
     }
@@ -281,8 +252,7 @@ exception send_no_wait( mailbox *mBox, void *pData)
     message->pBlock = NULL;
     message->Status = SENDER;
     
-    if(mBox->nMaxMessages <= mBox->nMessages)
-    {
+    if(mBox->nMaxMessages <= mBox->nMessages) {
       mBox->pHead = mBox->pHead->pNext;
       free(mBox->pHead->pPrevious);
     }
@@ -290,37 +260,26 @@ exception send_no_wait( mailbox *mBox, void *pData)
     isr_on();
   }
   return OK;
-}
-exception receive_no_wait( mailbox* mBox, void* pData)
-{
+} exception receive_no_wait( mailbox* mBox, void* pData) {
   msg* sendingMsg = mBox -> pHead;
-  if(sendingMsg->Status == SENDER)
-  {
+  if(sendingMsg->Status == SENDER) {
     isr_off(); // Disable interrupt
     memcpy(pData, sendingMsg -> pData, mBox -> nDataSize);
     deleteMsg(mBox, sendingMsg);
-    if(isMember(&WaitingList, sendingMsg->pBlock))                  //Needs to get called for testing
-    {
+    if(isMember(&WaitingList, sendingMsg->pBlock)) {                 //Needs to get called for testing
       PreviousTask = ReadyList->pHead->pTask; // Update PreviousTask
       removeTask(&WaitingList, sendingMsg ->pBlock); // Remove task from waiting list
       moveObj(&ReadyList, sendingMsg->pBlock); // Move sending task to ReadyList
       NextTask = ReadyList->pHead->pTask; // Update NextTask
       SwitchContext();
-    }
-    else
-    {
+    } else {
       free(sendingMsg->pData);
     }
-  }
-  else
-  {
-    return FAIL;
-  }
+  } else { return FAIL; }
   return OK;
 }
 
-exception wait(uint nTicks)
-{
+exception wait(uint nTicks) {
   isr_off();
   PreviousTask = ReadyList->pHead->pTask; // Update PreviousTask
   listobj* temp = ReadyList->pHead;
@@ -336,23 +295,13 @@ exception wait(uint nTicks)
     return OK;
 }
 
-void set_ticks( uint nTicks)
-{
-  Ticks = nTicks;
-}
+void set_ticks(uint nTicks) { Ticks = nTicks; }
 
-uint ticks(void)
-{
-  return Ticks;
-}
+uint ticks(void) { return Ticks; }
 
-uint deadline(void) 
-{
-  return NextTask->Deadline;
-}
+uint deadline(void) { return NextTask->Deadline; }
 
-void set_deadline(uint deadline)
-{
+void set_deadline(uint deadline) {
   isr_off();
   NextTask->Deadline = deadline;//Set deadline field in the calling TCB
   PreviousTask = ReadyList->pHead->pTask; // Update PreviousTask
