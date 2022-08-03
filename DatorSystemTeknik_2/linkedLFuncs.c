@@ -45,9 +45,7 @@ void moveObj(list** destinationDDL, listobj* obj) {
       (*destinationDDL)->pHead = obj;
       (*destinationDDL)->pTail = obj;
       return;
-    } else if((*destinationDDL)->pTail == NULL) {
-      (*destinationDDL)->pTail = obj;
-    }
+    } else if((*destinationDDL)->pTail == NULL) { (*destinationDDL)->pTail = obj; }
   } if(obj->pTask->Deadline > (*destinationDDL)->pTail->pTask->Deadline) {
     insertInListAfter(destinationDDL, (*destinationDDL)->pTail, obj);
     return;
@@ -96,8 +94,8 @@ void sortingLists(list** tempList) {
   *tempList = listing;
 }
 
-void deleteMsg(mailbox* mBox, msg* sms)         //Removes messages from mailbox
-{
+void deleteMsg(mailbox* mBox, msg* sms) {        //Removes messages from mailbox
+
   if (mBox->pHead == sms) {
     if(mBox -> pTail == sms) {
       mBox ->pHead = NULL;
@@ -130,14 +128,12 @@ void addTailMsgBox(msg* message, mailbox* mBox) {
   (mBox->nMessages)++;
 }
 
-bool isMember(list** name, listobj* node)               //checkes if an object in the list is the object pointed to
-{
+bool isMember(list** name, listobj* node) {            //checkes if an object in the list is the object pointed to
+
   list* tempList = *name;
   listobj* tempObj = tempList->pHead;
   while (tempObj != NULL) {
-    if (tempObj == node) {
-      return TRUE;
-    }
+    if (tempObj == node) { return TRUE; }
     tempObj = tempObj->pNext;
   }
   return FALSE;
