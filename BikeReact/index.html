@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+	  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+		<style>
+	  * {
+	  	font-family: sans-serif;
+	  }
+
+		.container {
+			width: 80%;
+			font-size: 0;
+		}
+
+		#div0 {
+		  padding: 30px;
+		  width: calc(100% - 60px);
+		}
+		#div1 {
+		  height: 300px;
+		  width: 20%;
+		  display: inline-block;
+		  vertical-align: top;
+		}
+
+		#div2 {
+		  height: 300px;
+		  width: 60%;
+		  display: inline-block;
+		}
+
+		#div3 {
+			background-color: #efefef;
+		  height: 300px;
+		  width: 20%;
+		  display: inline-block;
+		  vertical-align:top;
+		}
+
+		img {
+		  width: 100%;
+		  height: 100%;
+		}
+
+		.vertical-point-progress {
+		  max-width: 400px;
+		  list-style-type: none;
+		  margin: 30px 0 0 0;
+		  font-family: Poppins;
+		  font-size: 13px;
+		}
+
+		.vertical-point-progress li {
+		  padding: 0 0 20px 40px;
+		  position: relative;
+		  margin: 0;
+		}
+
+		.vertical-point-progress li:after {
+		  position: absolute;
+		  top: 0;
+		  left: 0;
+		  content: "";
+		  /* counter-increment: none; */
+		  border: 1px solid #ADB9C7;
+		  border-radius: 50%;
+		  display: inline-block;
+		  height: 24px;
+		  width: 24px;
+		  text-align: center;
+		  line-height: 24px;
+		  background: #ADB9C7;
+		}
+
+		.vertical-point-progress li:before {
+		  position: absolute;
+		  left: 12px;
+		  top: 0;
+		  content: "";
+		  height: 100%;
+		  width: 0;
+		  border: 2px solid lightgray;
+		}
+
+		.vertical-point-progress li:nth-child(1):before {
+			border: 2px solid green;
+		}
+
+		.vertical-point-progress li:nth-child(1):after {
+			color: white;
+			content: '✔';
+			background: green;
+		}
+
+		.vertical-point-progress li:nth-child(5):before {
+		  height: 0%;
+		}
+
+		.travelMethods {
+			transition: 1s;
+			font-size: 15px;
+			padding: 0 10px 0 10px;
+			text-align: center;
+			display: block;
+		}
+
+		.travelMethods p {
+			border-bottom: 2px solid #efefef;
+		}
+
+		.travelMethods p:hover {
+			border-bottom: 2px solid gray;
+		}
+
+		.subdomain, .subdomaintwo {
+			height: 30px;
+			font-size: 15px;
+		}
+
+		.subdomain, #div3 {
+	    border-top-right-radius: 4px;
+	    border-bottom-right-radius: 4px;
+	  }
+	  
+	  .subdomaintwo, #div1 {
+	    border-top-left-radius: 4px;
+	    border-bottom-left-radius: 4px;
+	  }
+
+		input[type="text"].subdomaintwo{
+	    -webkit-appearance: none!important;
+	    width: 50px;
+	    border: 1px solid black;
+	    border-right: 0px;
+	    margin: 0 -5px 0 0;
+	    color: black;
+	    background-color: #d9d9d9;
+		}
+		.subdomain{
+	    padding-left: 5px;
+	    -webkit-appearance: none!important;
+	    border: 1px solid black;
+	    border-left: 0px;
+	    outline: none;
+		}
+
+		input[type="text"]:nth-child(1) {
+			margin-left: calc(50% - 241px);
+		}
+
+		input[type="text"]:nth-child(3) {
+			margin-left: 30px;
+		}
+
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<!--<div id="div0">
+				<input type="text" class="subdomaintwo" value="From:" disabled/>
+        <input type="text" placeholder="Location" class="subdomain" required/>
+
+        <input type="text" class="subdomaintwo" value="To:" disabled/>
+        <input type="text" placeholder="Destination" class="subdomain" required/>
+			</div>
+			<div id="div1">
+				<ul class="vertical-point-progress">
+			    <li>Route</li>
+			    <li>Transport</li>
+			    <li>Fuel</li>
+			    <li>Frequency</li>
+			    <li>Done!</li>
+				</ul>
+			</div>
+			<div id="div2"><img alt="road" src="cykelVag.jpg"/></div>
+			<div id="div3">
+				<div class="travelMethods"><p>Bicycle</p></div>
+				<div class="travelMethods"><p>Electric bicycle</p></div>
+			</div>-->
+		</div>
+
+	<script type="text/babel">
+		class FromTo extends React.Component {
+		  render() {
+		  	let inputBars : string = [
+		  		["From:", "Location"],
+		  		["To:","Destination"]
+		  	];
+
+		    return (
+			    <div id="div0">
+			    	<input type="text" className="subdomaintwo" value={inputBars[0][0]} disabled/>
+        		<input type="text" placeholder={inputBars[0][1]} className="subdomain" required/>
+
+        		<input type="text" className="subdomaintwo" value={inputBars[1][0]} disabled/>
+        		<input type="text" placeholder={inputBars[1][1]} className="subdomain" required/>
+			    </div>
+		    );
+		  }
+		}
+	</script>
+
+	<script type="text/babel">
+		class ProgBar extends React.Component {
+		  render() {
+		  	let barTitles : string = [ "Route", "Transport", "Fuel", "Frequency", "Done!" ];
+		    const text = barTitles.map(title => {
+		      return (
+		        <li>{title}</li>
+		      )
+		    });
+
+		    return <div id="div1"><ul className="vertical-point-progress">{text}</ul></div>;
+		  }
+		}
+	</script>
+
+	<script type="text/babel">
+		class RouteDisplay extends React.Component {
+		  render() {
+		    return <div id="div2"><img alt="road" src="cykelVag.jpg"/></div>;
+		  }
+		}
+	</script>
+
+	<script type="text/babel">
+		class TransportAlt extends React.Component {
+		  render() {
+		  	let alts : string = [ "Bicycle", "Electric bicycle" ];
+		    const text = alts.map(alt => {
+		      return (
+		        <div className="travelMethods"><p>{alt}</p></div>
+		      )
+		    });
+
+		    return <div id="div3">{text}</div>;
+		  }
+		}
+	</script>
+
+	<script type="text/babel">
+    function Contain() {
+      return (
+      	<div id="ret">
+      		<FromTo/>
+      		<ProgBar/>
+	      	<RouteDisplay/>
+	      	<TransportAlt/>
+      	</div>
+      );
+    }
+    
+    ReactDOM.render(<Contain />, document.getElementsByClassName('container')[0]);
+	</script>
+	</body>
+</html>
