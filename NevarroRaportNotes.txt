@@ -1,0 +1,2 @@
+reCaptcha when web scraping from transportstyrelsen,
+No input sanitation when receiving data from the settings pages.
