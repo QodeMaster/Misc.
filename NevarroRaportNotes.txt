@@ -1,2 +1,5 @@
-reCaptcha when web scraping from transportstyrelsen,
-No input sanitation when receiving data from the settings pages.
+Note on bicycle page: No input sanitation because beyond scope for project
+Not able to webscrape transpiortstyrelsen
+MET calculation for bicycling and walking formula, account for BMR
+JSON.parse ofr session storagehydratio error
+
