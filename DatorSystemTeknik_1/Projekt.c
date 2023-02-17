@@ -4,22 +4,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct calender 
-{
+typedef struct calender {
  short date[6];
  int8_t decimalPointer;
  uint8_t sequence[14];
 } calender;
 
-typedef struct LinkedList
-{
+typedef struct LinkedList {
   short timeStamp[6]; 
   short temprature; 
   struct LinkedList *next; 
 } LinkedList;
 
-typedef struct StatsForADay
-{
+typedef struct StatsForADay {
   short timeStampMax[6]; 
   short max; 
   short avg;
@@ -167,75 +164,53 @@ void main(void) {
    stats[0].min = 1000;
    stats[0].max = 0;
    
-   while(1)
-   {
-     if(TEMPRATURE_INTERRUPT_FLAG == 1)
-     {
+   while(1) {
+     if(TEMPRATURE_INTERRUPT_FLAG == 1) {
        tempCalculator();
        TEMPRATURE_INTERRUPT_FLAG = 0; 
        StartMeasureTemp();
-       if(tempMax <= temprature || tempMin >= temprature)
-       {
-         Set_WarningLed(1);
-       }
-       else
-         Set_WarningLed(0);
+       if(tempMax <= temprature || tempMin >= temprature) { Set_WarningLed(1); } 
+       else { Set_WarningLed(0); }
      }
     
-      if((*AT91C_ADCC_LCDR & (0xf << 12)) == (1 << 13)) 
-      {
+      if((*AT91C_ADCC_LCDR & (0xf << 12)) == (1 << 13))  {
         light1  = ((*AT91C_ADCC_LCDR & (0xFFF << 0)));
         StartMeasureLight();
       }
      
-     if(o == 79)
-     {
+     if(o == 79) {
        locationOnDisplay(0x28,0x00);
        display("Configure: DD/MM/YYYY hh:mm:ss"); // 30 Character wide screen
        o=59;
      }
      
      p = returnKeypadValue(&trigger); // p = keypad value 
-     if(trigger == 1)
-     {
+     if(trigger == 1) {
        DisplayKeyboard(p);   // Displays the keypad value on the screen 
        Delay(5000000);
        trigger = 0;
      }
      
-     if((secSinceLastTempMeasurement == 60) && (sevenDaysHasPassed == 0)) 
-     { // Req 2 in project
+     if((secSinceLastTempMeasurement == 60) && (sevenDaysHasPassed == 0)) { // Req 2 in project
        
-       if(isFirstTimeMeasured == 1)
-       {
+       if(isFirstTimeMeasured == 1) {
          initLL(head, time.date, temprature);
          isFirstTimeMeasured = 0;
-       }
-       else 
-       {
-         insertFirst(head, time.date, temprature);
-       }
+       } else { insertFirst(head, time.date, temprature); 
        secSinceLastTempMeasurement = 0;
      }
-     if((secSinceLastTempMeasurement >= 1) && (sevenDaysHasPassed == 0) && (fastMode == 1)) 
-     {
+     if((secSinceLastTempMeasurement >= 1) && (sevenDaysHasPassed == 0) && (fastMode == 1)) {
        
-       if(isFirstTimeMeasured == 1)
-       {
+       if(isFirstTimeMeasured == 1) {
          initLL(head, time.date, temprature);
          isFirstTimeMeasured = 0;
-       }
-       else 
-       {
-         insertFirst(head, time.date, temprature);
-       }
+       } else  { insertFirst(head, time.date, temprature); }
        secSinceLastTempMeasurement = 0;
      }
    }
 }
 
-int returnKeypadValue(short* trigger)
-{
+int returnKeypadValue(short* trigger) {
    *AT91C_PMC_PCER   = (3<<13);                        // Enable control over PIOC and PIOD, also defined in InitDisplay()
    *AT91C_PIOD_PER   = (1<<2);                         // Enable PIO on G, ~OE    
    *AT91C_PIOD_OER   = (1<<2);                         // Enable output on G, ~OE     
@@ -248,13 +223,10 @@ int returnKeypadValue(short* trigger)
    *AT91C_PIOC_PPUDR = (7<<7) | (15<<2);               // Disable pull-up resistance on port C bit 2,3,4,5,7,8,9   
    *AT91C_PIOC_SODR  = (7<<7);                         // Setting all col pin as high   
 
-     for(int k = 0; k < 3; k++)  
-     { // Col loop   
+     for(int k = 0; k < 3; k++) { // Col loop   
       *AT91C_PIOC_CODR = (1<<colOrder[k]);  // Clear Col   
-      for(int l = 0; l < 4; l++)  
-      { // Row loop   
-        if((*AT91C_PIOC_PDSR & (1<<rowOrder[l])) == 0)
-        {
+      for(int l = 0; l < 4; l++) { // Row loop   
+        if((*AT91C_PIOC_PDSR & (1<<rowOrder[l])) == 0) {
           value = l * 3 + k + 1; 
           *trigger = 1; 
         }
@@ -266,15 +238,13 @@ int returnKeypadValue(short* trigger)
    return value; 
 } 
 
-void Delay(int Value)
-{
+void Delay(int Value) 
   int i;  
   for(i=0;i<Value;i++)  
     asm("nop");  
 } 
 
-void Init_Display(void)
-{
+void Init_Display(void) 
   *AT91C_PMC_PCER=(3<<13);      // Port C, D
 
   *AT91C_PIOC_PER   = 0xffffffff; // Enable every pins
@@ -303,8 +273,7 @@ void Init_Display(void)
   Write_Command_2_Display(0x94); // Text on graphic off  
 } 
 
-void Write_Data_2_Display(unsigned char Data)
-{
+void Write_Data_2_Display(unsigned char Data) 
   while((Read_Status_Display()) & (12) != 12){} 
   *AT91C_PIOC_OER  = (255<<2);               // output enable pin 34 - 41 
   *AT91C_PIOC_CODR = (255<<2);               // clear databus 
@@ -322,8 +291,7 @@ void Write_Data_2_Display(unsigned char Data)
   *AT91C_PIOC_ODR  = (255<<2); // output disable pin 34 - 41 
 } 
 
-void Write_Command_2_Display(unsigned char Command) 
-{ 
+void Write_Command_2_Display(unsigned char Command) { 
   while((Read_Status_Display()) & (0xC) != 0xC){} 
 
     *AT91C_PIOC_OER  = (255<<2); // output enable pin 34 - 41 
@@ -342,8 +310,7 @@ void Write_Command_2_Display(unsigned char Command)
     *AT91C_PIOC_ODR = (255<<2); // output disable pin 34 - 41 
 } 
 
-unsigned char Read_Status_Display()
-{
+unsigned char Read_Status_Display() 
     unsigned char temp; 
 
     *AT91C_PIOC_ODR   = (255<<2); // output disable pin 34 - 41 
@@ -363,18 +330,13 @@ unsigned char Read_Status_Display()
     return temp; 
 }   
 
-void DisplayKeyboard(int inp)
-{
-  if(o==0) 
-  {
+void DisplayKeyboard(int inp) 
+  if(o==0) {
     clearDisplay(0x00,0x00);
   }
-  if(time.decimalPointer < 14)
-  {
-    if(9 < inp)
-    {
-      switch(inp)
-      {
+  if(time.decimalPointer < 14) {
+    if(9 < inp) {
+      switch(inp) {
       case 10: 
         Write_Data_2_Display(0x0A); 
         Write_Command_2_Display(0xc0); 
@@ -393,94 +355,69 @@ void DisplayKeyboard(int inp)
         break; 
       } 
     }
-    else
-    {
+    else {
       Write_Data_2_Display(digits[inp]);
       Write_Command_2_Display(0xc0);
     }
     assignToSeq((inp == 11 ? 0 : inp));
   }
-  else if(allowKeyPadInput == 0)
-  {
-    if(inp == 11) {
-      displayOptions();
-    }
-    else if(2 <= inp && inp <= 8) 
-    {
-      displayDay(inp - 1 - 1);
-    }
-    else if(inp == 10)
-    {
-      fastMode = (fastMode + 1) % 2;
-    }
-    else if(inp == 12)
-    {
-      newTimeConfig();
-    }
-    else if(inp == 9 && o == 59)
-    {
+  else if(allowKeyPadInput == 0) {
+    if(inp == 11) { displayOptions(); }
+    else if(2 <= inp && inp <= 8) { displayDay(inp - 1 - 1); }
+    else if(inp == 10) { fastMode = (fastMode + 1) % 2; }
+    else if(inp == 12) { newTimeConfig(); }
+    else if(inp == 9 && o == 59) {
       allowKeyPadInput = 1;
       display("Configure Highest\\Lowest allowed temerature");
       o = 49;
     }
-  } 
-  else if(allowKeyPadInput == 1)
-  {
+  } else if(allowKeyPadInput == 1) {
       assignTempSeq((inp == 11 ? 0 : inp));
       Write_Data_2_Display(digits[(inp == 11 ? 0 : inp)]);
       Write_Command_2_Display(0xc0);
   }
 }
 
-void clearDisplay(int x, int y)
-{
+void clearDisplay(int x, int y) {
   locationOnDisplay(x,y);
 
-  for(int i=0;i<(30*16);i++) // clear display
-  {
+  for(int i=0;i<(30*16);i++) { // clear display
     Write_Data_2_Display(0x00);
     Write_Command_2_Display(0xC0);
   }
   locationOnDisplay(0x00,0x00);
 }
 
-void locationOnDisplay(int x,int y)
-{
+void locationOnDisplay(int x, int y) {
   Write_Data_2_Display(x);
   Write_Data_2_Display(y); 
   Write_Command_2_Display(0x24);
 }
 
-void display(char ch[]) 
-{
+void display(char ch[]) {
   clearDisplay(0x00,0x00);
   rawDisplay(ch);
 }
 
-void rawDisplay(char ch[]) 
-{
-  for(char m = 0; '\0' !=ch[m];m++) 
-  {
+void rawDisplay(char ch[]) {
+  for(char m = 0; '\0' != ch[m]; m++)   {
     char temp = ch[m] - 0x20;
     Write_Data_2_Display(temp);
     Write_Command_2_Display(0xC0);
   }
 }
 
-void displayInt(int inp) 
-{
+void displayInt(int inp) {
   int lg = (inp == 0 ? 0 : (int)log10(inp));
 
-  for(int i = lg; 0 <= i; i--) 
-  {
+  for(int i = lg; 0 <= i; i--) {
     int digit = getDigit(i, inp);
     Write_Data_2_Display(digits[digit]);
     Write_Command_2_Display(0xc0);
   }
 }
 
-void newTimeConfig()
-{
+void newTimeConfig() {
   DeleteList(&head, stats);
   free(head);
   time.decimalPointer = 0;
@@ -496,55 +433,37 @@ void newTimeConfig()
   fastMode = 0; 
   o = 79;
 
-  for(int i = 0; i < 14; i++)
-  {
-    time.sequence[i] = 0;
-  }
-  for(int i = 0; i < 7; i++)
-  {
+  for(int i = 0; i < 14; i++) { time.sequence[i] = 0; }
+  for(int i = 0; i < 7; i++) {
     stats[i].max = 0;
     stats[i].min = 1000;
     stats[i].avg = 0;
   }
-  for(int i = 0; i<6;i++)
-  {
-    time.date[i] = 0;
-  }
-  
+  for(int i = 0; i < 6; i++) { time.date[i] = 0; }
+ 
   initLL(head, time.date, temprature);
 }
 
-void assignToSeq(short inp)
-{
- if(time.decimalPointer < 14)
- {
+void assignToSeq(short inp) {
+ if(time.decimalPointer < 14) {
    time.sequence[time.decimalPointer] = inp;
    if(time.decimalPointer == 13)
      assignDigitToCalender(time.sequence);
- } 
- else 
- {
-   displayOptions();
- }
+ } else { displayOptions(); }
  time.decimalPointer++;
 }
 
-void assignDigitToCalender(uint8_t seq[])
-{
+void assignDigitToCalender(uint8_t seq[]) {
  int yearPow = 3;
  int otherPow = 1;
  int offset = 0;
- for(int i = 0; i < 14; i++)
- {
+ for(int i = 0; i < 14; i++) {
   int digit = seq[i];
 
-  if(4 <= i && i <= 7)
-  {
+  if(4 <= i && i <= 7) {
     time.date[2] += (digit * (int)(pow(10, yearPow--)));
     offset = 2;
-  }
-  else
-  {
+  } else {
     time.date[(i - offset) / 2] += (digit * (int)(pow(10, otherPow)));
     otherPow = (otherPow + 1) % 2; // Flip between 1 and 0
   }
@@ -555,49 +474,34 @@ void assignDigitToCalender(uint8_t seq[])
  rawDisplay("Press 0 to Proceed");
 }
 
-void displayTime(int from, int to, short date[6]) 
-{
- for(int l = from; l < to; l++) 
- {
+void displayTime(int from, int to, short date[6]) {
+ for(int l = from; l < to; l++) {
   int num = date[l];
   int lg  = (num == 0 ? 0 : (int)log10(num));
-  if(lg == 0) 
-  {
+  if(lg == 0) {
     Write_Data_2_Display(0x10); // 0x10 = 0
     Write_Command_2_Display(0xc0);
   }
-  for(int h = lg; 0 <= h; h--) 
-  {
+  for(int h = lg; 0 <= h; h--) {
     int digit = getDigit(h, num);
     char ch = digits[digit];
     Write_Data_2_Display(ch);
     Write_Command_2_Display(0xc0);
   }
-  if(l < 3) 
-  {
+  if(l < 3) {
     Write_Data_2_Display(l == 2 ? 0x00 : 0x0F);
     Write_Command_2_Display(0xc0);
-  } 
-  else if(l < 5) 
-  {
+  } else if(l < 5) {
     Write_Data_2_Display(0x1A);
     Write_Command_2_Display(0xc0);
   }
  }
 
- if(time.decimalPointer == 13)
- {
+ if(time.decimalPointer == 13) {
   int boolean = 0;    // boolean = 0, means input values makes up valid time
-  if((12 < time.date[1] || time.date[1] == 0) || (time.date[2] < 2021) || (23 < time.date[3]) || (59 < time.date[4]) || (59 < time.date[5])) 
-  {
-    boolean = 1; 
-  }
-  if(boolean == 0 && (months[time.date[1] - 1] < time.date[0] || time.date[0] == 0)) 
-  {
-    boolean = 1;
-  }
-  if(boolean == 1) 
-  { 
+  if((12 < time.date[1] || time.date[1] == 0) || (time.date[2] < 2021) || (23 < time.date[3]) || (59 < time.date[4]) || (59 < time.date[5])) { boolean = 1; }
+  if(boolean == 0 && (months[time.date[1] - 1] < time.date[0] || time.date[0] == 0)) { boolean = 1; }
+  if(boolean == 1) { 
     display("INVALID INPUT!-RESTART CONFIG");
     time.decimalPointer = 15; // To inactivate the if-statement in the sysTick-handler
     Delay(10000000);
@@ -606,17 +510,14 @@ void displayTime(int from, int to, short date[6])
  }
 }
 
-void moveToNextRow(int spaces) 
-{
-  for(int i = 0; i < spaces; i++) 
-  {
+void moveToNextRow(int spaces) {
+  for(int i = 0; i < spaces; i++) {
     Write_Data_2_Display(0x00);
     Write_Command_2_Display(0xc0);
   }
 }
 
-void displayOptions()
-{
+void displayOptions() {
   clearDisplay(0x00,0x00);
   
   rawDisplay("Press 2 for Day 1");
@@ -641,11 +542,9 @@ void displayOptions()
   rawDisplay("Press * for fastMode");
 }
 
-void displayDay(int dayToDisplay)
-{
+void displayDay(int dayToDisplay) {
   clearDisplay(0x00,0x00);
-  if(dayToDisplay < whatDayInStatsPointer) 
-  {
+  if(dayToDisplay < whatDayInStatsPointer) {
     StatsForADay day = stats[dayToDisplay];
     
     displayTime(0, 3, day.timeStampMin);
@@ -670,9 +569,7 @@ void displayDay(int dayToDisplay)
     rawDisplay("  ");
     displayTime(3, 6, day.timeStampMin);
     moveToNextRow(30 - 17);
-  } 
-  else
-  {
+  } else {
     rawDisplay("Data for that day");
     moveToNextRow(30 - 17);
     rawDisplay("does not yet exist");
@@ -695,133 +592,93 @@ void displayDay(int dayToDisplay)
   rawDisplay("      Press 0 to return");
 }
 
-void addSecondToConfiguredCalender() 
-{
+void addSecondToConfiguredCalender() {
   int carry = 0;
   if(time.date[5] == 59) { // Seconds
     time.date[5] = 0;
     carry = 1;
-  }
-  else 
-   time.date[5]++; 
-  if(carry + time.date[4] == 60) 
-  { // Minutes
+  } else { time.date[5]++; } 
+  if(carry + time.date[4] == 60) { // Minutes
     time.date[4] = 0;
     carry = 1;
-  } 
-  else 
-  { 
+  } else { 
     time.date[4] = time.date[4] + carry;
     carry = 0;
-  }
-  if(carry + time.date[3] == 24) 
-  { // Hours
+  } if(carry + time.date[3] == 24) { // Hours
     time.date[3] = 0;
     carry = 1;
     switchDay();
-  }
-  else 
-  { 
+  } else { 
     time.date[3] = time.date[3] + carry;
     if(6 <= time.date[3] && time.date[3] < 22) { lightModeForSensor(); }
     else { darkModeForSensor(); }
     carry = 0;
   }
-  if(carry + time.date[0] == months[time.date[1] - 1] + 1) 
-  { // Days
+  if(carry + time.date[0] == months[time.date[1] - 1] + 1) { // Days
     time.date[0] = 1;
     carry = 1;
-  } 
-  else 
-  { 
+  } else { 
     time.date[0] = time.date[0] + carry;
     carry = 0;
-  }
-  if(carry + time.date[1] == 13) 
-  { // Months
+  } if(carry + time.date[1] == 13) { // Months
     time.date[1] = 1;
     carry = 1;
-  } 
-  else 
-  { 
+  } else { 
     time.date[0] = time.date[0] + carry;
     carry = 0;
   }
   time.date[2] = time.date[2] + carry; // Year
 }
 
-void addTwentyMinutesToConfiguredCalender()
-{
+void addTwentyMinutesToConfiguredCalender() {
   int carry = 0;
   // Seconds won't change because only minutes and upwards are incremented
-  if(20 + time.date[4] >= 60)  // Minutes, 20 minute increment
-  {
+  if(20 + time.date[4] >= 60) { // Minutes, 20 minute increment
     time.date[4] = (20 + time.date[4]) % 60;
     carry = 1;
-  } 
-  else
-  {
+  } else  {
     if(6 <= time.date[3] && time.date[3] < 22) { lightModeForSensor(); }
     else { darkModeForSensor(); }
     time.date[4] = time.date[4] + 20; 
   }
-  if(carry + time.date[3] == 24) 
-  { // Hours
+  if(carry + time.date[3] == 24) { // Hours
     time.date[3] = 0;
     carry = 1;
     switchDay();
-  }
-  else 
-  {
+  } else  {
     time.date[3] = time.date[3] + carry;
     carry = 0;
   }
-  if(carry + time.date[0] == months[time.date[1] - 1] + 1) 
-  { // Days
+  if(carry + time.date[0] == months[time.date[1] - 1] + 1) { // Days
     time.date[0] = 1;
     carry = 1;
-  } 
-  else 
-  { 
+  } else { 
     time.date[0] = time.date[0] + carry;
     carry = 0;
-  }
-  if(carry + time.date[1] == 13) 
-  { // Months
+  } if(carry + time.date[1] == 13) { // Months
     time.date[1] = 1;
     carry = 1;
-  } 
-  else 
-  {
+  } else {
     time.date[0] = time.date[0] + carry;
     carry = 0;
   }
   time.date[2] = time.date[2] + carry; // Year
 }
 
-void SysTick_Handler(void)
-{
+void SysTick_Handler(void) {
   clockCounter += ((sevenDaysHasPassed + 1) % 2); // Stops adding if seven days are fullfilled
   avgLightVoltage = totLight / totLightDivider;
-  if((clockCounter % 100 == 0) && (time.decimalPointer == 14))
-  {
+  if((clockCounter % 100 == 0) && (time.decimalPointer == 14)) {
     totLight        = 350;
     totLightDivider = 1;
-    if(fastMode == 0)
-    {
-      addSecondToConfiguredCalender();
-    }
-    if(fastMode == 1)
-    {
-      addTwentyMinutesToConfiguredCalender();
-    }
+    if(fastMode == 0) { addSecondToConfiguredCalender(); }
+    if(fastMode == 1) { addTwentyMinutesToConfiguredCalender(); }
     clockCounter = 1;
     secSinceLastTempMeasurement++;
   }
 }
 
-void tempInit()
-{   
+void tempInit() {   
   *AT91C_PMC_PCER = (1 << 12) | (1 << 27); // Enable peripheral PIOB and TC0  
 
   *AT91C_TC0_CMR  = (*AT91C_TC0_CMR & 0xFFFE); 
@@ -839,8 +696,7 @@ void tempInit()
   NVIC_EnableIRQ(TC0_IRQn);       // Enable the interrupt  
 }
 
-void StartMeasureTemp(void)
-{  
+void StartMeasureTemp(void) {  
   CreatePulseInPin2(672000); // Create a reset pulse, 8ms long 
   //Create a startpuls with a Delay(25)   
   CreatePulseInPin2(25);  
@@ -850,8 +706,7 @@ void StartMeasureTemp(void)
   *AT91C_TC0_IER = (1 << 6); // Enable interrupt for LDRBS   
 } 
 
-void CreatePulseInPin2(int pulseWidth)
-{   
+void CreatePulseInPin2(int pulseWidth) {   
   *AT91C_PIOB_OER  = (1 << 25); // Make pin 2 an output   
   *AT91C_PIOB_CODR = (1 << 25); // Put a low signal on the I/O line   
   Delay(pulseWidth); 
@@ -859,61 +714,41 @@ void CreatePulseInPin2(int pulseWidth)
   *AT91C_PIOB_ODR  = (1 << 25); // Make pin 2 an input   
 } 
 
-void TC0_Handler()
-{   
+void TC0_Handler() {   
   *AT91C_TC0_IDR = (1 << 6); // Disable interrupt for LDRBS   
   TEMPRATURE_INTERRUPT_FLAG = 1;     // Setting global flag   
 }
 
-void tempCalculator()
-{
+void tempCalculator() {
   TCA = *AT91C_TC0_RA;   
   TCB = *AT91C_TC0_RB;  
 
   deltaT = TCB - TCA;  
   // (1/210) = 1000000 * (1/(5 * TIMER_CLOCK1))
-  if(temprature != (deltaT / 210) - 273)
-  {
-    temprature = (deltaT / 210) - 273;
-  }
+  if(temprature != (deltaT / 210) - 273) { temprature = (deltaT / 210) - 273; }
 }
 
-void insertFirst(LinkedList *first, short dateAndTime[6], short tempratureMeasurement)
-{
+void insertFirst(LinkedList *first, short dateAndTime[6], short tempratureMeasurement) {
   LinkedList *el = (LinkedList*)malloc(sizeof(LinkedList));
-  if(el != NULL)
-  {
-    for(int i = 0; i < 6; i++)
-    {
-      (el->timeStamp)[i] = dateAndTime[i];
-    }
+  if(el != NULL) {
+    for(int i = 0; i < 6; i++) { (el->timeStamp)[i] = dateAndTime[i]; }
     el->temprature = tempratureMeasurement;
     el->next       = head;
     head = el;
     linkedListLength++;
     measurementCount++;
   }
-  if(linkedListLength == 250)
-  {
-    DeleteList(&head, stats);
-  }
+  if(linkedListLength == 250) { DeleteList(&head, stats); }
 }
 
-void initLL(LinkedList *first, short dateAndTime[6], short tempratureMeasurement) 
-{
+void initLL(LinkedList *first, short dateAndTime[6], short tempratureMeasurement) {
   LinkedList initial;
   
-  for(int i = 0; i < 6; i++) 
-  {
-    initial.timeStamp[i] = dateAndTime[i];
-  }
+  for(int i = 0; i < 6; i++) { initial.timeStamp[i] = dateAndTime[i]; }
   initial.temprature = tempratureMeasurement;
   initial.next       = NULL;
   
-  for(int i = 0; i < 6; i++)
-  {
-    (first)->timeStamp[i] = initial.timeStamp[i];
-  }
+  for(int i = 0; i < 6; i++) { (first)->timeStamp[i] = initial.timeStamp[i]; }
   (first)->temprature = initial.temprature;
   first->next         = initial.next;
   
@@ -921,8 +756,7 @@ void initLL(LinkedList *first, short dateAndTime[6], short tempratureMeasurement
   measurementCount++;
 }
 
-void DeleteList(LinkedList **first, StatsForADay stats[7]) 
-{
+void DeleteList(LinkedList **first, StatsForADay stats[7]) {
   LinkedList *holderHolder;
   int max = stats[whatDayInStatsPointer].max;
   int min = stats[whatDayInStatsPointer].min;
@@ -931,28 +765,16 @@ void DeleteList(LinkedList **first, StatsForADay stats[7])
   short timeStampMin[6];
   short timeStampTemp[7 - 1];
   
-  for(int i = 0; i < 6; i++) 
-  {
-    timeStampTemp[i] = head->timeStamp[i];
-  }
-  while(head != NULL) 
-  {
+  for(int i = 0; i < 6; i++) { timeStampTemp[i] = head->timeStamp[i]; }
+  while(head != NULL) {
     nrList++;
-    if(max < head->temprature)
-    {
+    if(max < head->temprature) {
       max = head->temprature;
-      for(int i = 0; i < 6; i++) 
-      {
-        timeStampMax[i] = head->timeStamp[i];
-      }
+      for(int i = 0; i < 6; i++) { timeStampMax[i] = head->timeStamp[i]; }
     }
-    if(head->temprature < min)
-    {
+    if(head->temprature < min) {
       min = head->temprature;
-      for(int i = 0; i < 6; i++)
-      {
-        timeStampMin[i] = head->timeStamp[i];
-      }
+      for(int i = 0; i < 6; i++) { timeStampMin[i] = head->timeStamp[i]; }
     }
     totalMeasuredTemp += (head->temprature);
     holderHolder = head->next;
@@ -960,36 +782,24 @@ void DeleteList(LinkedList **first, StatsForADay stats[7])
     head = holderHolder;
   }
   
-  if(stats[whatDayInStatsPointer].max < max) 
-  { 
+  if(stats[whatDayInStatsPointer].max < max) { 
     // Checking if the values measured prevously in the day are greater or less than the one in this measurement
     stats[whatDayInStatsPointer].max = max;
-    for(int i = 0; i < 6; i++)
-    {
-      stats[whatDayInStatsPointer].timeStampMax[i] = timeStampMax[i];
-    }
+    for(int i = 0; i < 6; i++) { stats[whatDayInStatsPointer].timeStampMax[i] = timeStampMax[i]; }
   }
   
-  if(min < stats[whatDayInStatsPointer].min) 
-  {
+  if(min < stats[whatDayInStatsPointer].min) {
     stats[whatDayInStatsPointer].min = min;
-    for(int i = 0; i < 6; i++) 
-    {
-      stats[whatDayInStatsPointer].timeStampMin[i] = timeStampMin[i];
-    }
+    for(int i = 0; i < 6; i++) { stats[whatDayInStatsPointer].timeStampMin[i] = timeStampMin[i]; }
   }
   
   head = (LinkedList*)malloc(sizeof(LinkedList));
-  for(int i = 0; i < 6; i++)
-  {
-    head->timeStamp[i] = timeStampTemp[i];
-  }
+  for(int i = 0; i < 6; i++) { head->timeStamp[i] = timeStampTemp[i]; }
   isFirstTimeMeasured = 1;
   linkedListLength = 0;
 }
 
-void switchDay() 
-{
+void switchDay() {
   DeleteList(&head, stats);
   
   // Calculate avrage temp and assign to the day
@@ -1000,19 +810,14 @@ void switchDay()
   totalMeasuredTemp = 0;
   
   whatDayInStatsPointer++; // Move on to the next day
-  if(6 < whatDayInStatsPointer) 
-  {
-    sevenDaysHasPassed = 1;
-  }
-  else 
-  {
+  if(6 < whatDayInStatsPointer) { sevenDaysHasPassed = 1; }
+  else {
     stats[whatDayInStatsPointer].max = 0;
     stats[whatDayInStatsPointer].min = 1000;
   }          
 }
 
-void servoInit()
-{
+void servoInit() {
   *AT91C_PMC_PCER = (1<<12); // PIOB
   *AT91C_PMC_PCER1 = (1<<4); // PWM
   *AT91C_PIOB_PDR = (1<<17); // Enable pin 62, Analog 8
@@ -1029,25 +834,14 @@ void servoInit()
   *AT91C_PWMC_CH1_CDTYR= 0xA41; //1ms
 }
 
-void Serv_Rotate(double degree) 
-{
-  *AT91C_PWMC_CH1_CDTYUPDR = (int)(1837*2+(29*(degree)));
+void Serv_Rotate(double degree) { *AT91C_PWMC_CH1_CDTYUPDR = (int)(1837*2+(29*(degree))); }
+
+void Set_Led(int nLed) { 
+  if(nLed == 0) { *AT91C_PIOD_CODR = (1<<3); } 
+  else { *AT91C_PIOD_SODR = (1<<3); } 
 }
 
-void Set_Led(int nLed)
-{ 
-  if(nLed == 0) 
-  {
-    *AT91C_PIOD_CODR = (1<<3); 
-  } 
-  else 
-  {
-    *AT91C_PIOD_SODR = (1<<3); 
-  } 
-}
-
-void lightInit()
-{ 
+void lightInit() { 
   *AT91C_PMC_PCER  = (1<<11);// Enabling peripheral PIOA 
   *AT91C_PMC_PCER1 = (1<<5); // ADC 
   *AT91C_PIOA_PER = (1 << 4);
@@ -1067,8 +861,7 @@ void lightInit()
   *AT91C_ADCC_CWR = (1 << 24);
 } 
 
-void lampInit()
-{
+void lampInit() {
   *AT91C_PIOD_PER = (1<<3); 
   *AT91C_PIOD_OER = (1<<3); 
   *AT91C_PIOD_PPUDR = (1<<3);
@@ -1077,47 +870,29 @@ void lampInit()
   *AT91C_PIOD_OER = (1<<1); 
   *AT91C_PIOD_PPUDR = (1<<1);
 }
-void StartMeasureLight(void)
-{ 
-  *AT91C_ADCC_CR  = (1<<1);  // Enabling ADC 
-} 
 
-void ADC_Handler()
-{ 
+void StartMeasureLight(void) { *AT91C_ADCC_CR  = (1<<1); } // Enabling ADC 
+ 
+void ADC_Handler() { 
   status = *AT91C_ADCC_IMR; 
   *AT91C_ADCC_IDR = (1<<2); 
   LIGHT_INTERRUPT_FLAG = 1;     // Setting global flag  
 }
 
-void lightModeForSensor() 
-{
+void lightModeForSensor() {
   Serv_Rotate(10.0); // Servo open, to let light throught
-  if(700 < light1) 
-  {
-    Set_Led(1);
-  } 
-  else 
-  {
-    Set_Led(0);
-  }
+  if(700 < light1) { Set_Led(1); } 
+  else { Set_Led(0); }
 }
 
-void darkModeForSensor() 
-{
+void darkModeForSensor() {
   Serv_Rotate(100.0); // Servo closed, to block potential light
   Set_Led(0);
 }
 
-void Set_WarningLed(int nLed)
-{
-  if(nLed == 0) 
-  {
-    *AT91C_PIOD_CODR = (1<<1); 
-  } 
-  else 
-  {
-    *AT91C_PIOD_SODR = (1<<1); 
-  }
+void Set_WarningLed(int nLed) {
+  if(nLed == 0) { *AT91C_PIOD_CODR = (1<<1); } 
+  else { *AT91C_PIOD_SODR = (1<<1); }
 }
 
 void assignTempSeq(int inp) {
