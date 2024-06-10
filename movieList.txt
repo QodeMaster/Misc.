@@ -1,5 +1,5 @@
+Idiocracy
 The bay
-the ritual
 The dead don't die
 deep blue sea
 ben10
@@ -7,3 +7,7 @@ pokemonFilm
 the thaw
 the wretched
 drag me to h*ll
+
+// SEEN
+the ritual
+ruins
