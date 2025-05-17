@@ -7,6 +7,7 @@ pokemonFilm
 the thaw
 the wretched
 drag me to h*ll
+ready or not
 
 // SEEN
 the ritual
